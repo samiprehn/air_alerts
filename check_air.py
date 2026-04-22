@@ -6,7 +6,7 @@ import requests
 NTFY_TOPIC = os.environ['NTFY_TOPIC']
 AIRNOW_API_KEY = os.environ['AIRNOW_API_KEY']
 ZIP_CODE = os.environ['ZIP']
-THRESHOLD = int(os.environ.get('AQI_THRESHOLD', '101'))
+THRESHOLD = int(os.environ.get('AQI_THRESHOLD') or '101')
 
 SEEN_FILE = 'seen.json'
 
