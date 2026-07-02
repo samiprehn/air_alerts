@@ -50,15 +50,22 @@ def notify(obs):
     title = f"Air quality: {obs['category']}"
     message = f"AQI {obs['aqi']} ({obs['pollutant']}) in {obs['area']}."
     priority = 'high' if obs['aqi'] >= 151 else 'default'
-    requests.post(
-        f'https://ntfy.sh/{NTFY_TOPIC}',
-        data=message.encode(),
-        headers={
-            'Title': title,
-            'Priority': priority,
-            'Click': 'https://www.airnow.gov/',
-        },
-    )
+    try:
+        resp = requests.post(
+            f'https://ntfy.sh/{NTFY_TOPIC}',
+            data=message.encode(),
+            headers={
+                'Title': title,
+                'Priority': priority,
+                'Click': 'https://www.airnow.gov/',
+            },
+            timeout=10,
+        )
+        resp.raise_for_status()
+        return True
+    except Exception as e:
+        print(f"ntfy error: {e}")
+        return False
 
 
 def main():
@@ -75,9 +82,11 @@ def main():
     was_alerted = state.get('alerted', False)
 
     if bad and not was_alerted:
-        notify(obs)
-        state['alerted'] = True
-        print(f"Alerted: AQI crossed to {obs['aqi']} (threshold {THRESHOLD})")
+        if notify(obs):
+            state['alerted'] = True
+            print(f"Alerted: AQI crossed to {obs['aqi']} (threshold {THRESHOLD})")
+        else:
+            print("Notification failed, will retry next run")
     elif not bad and was_alerted:
         state['alerted'] = False
         print(f"Cleared: AQI dropped to {obs['aqi']}, below threshold {THRESHOLD}")
