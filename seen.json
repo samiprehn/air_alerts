@@ -1,6 +1,6 @@
 {
-  "alerted": true,
-  "last_aqi": 165,
-  "last_pollutant": "PM2.5",
-  "last_category": "Unhealthy"
+  "alerted": false,
+  "last_aqi": 57,
+  "last_pollutant": "PM10",
+  "last_category": "Moderate"
 }
